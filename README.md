@@ -1,7 +1,6 @@
 # iProphIT
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/7857e8df-0375-45e3-805c-490e3ad402c8" alt="iProphIT Logo">
-
+  <img src="https://github.com/user-attachments/assets/c7aa2e32-0611-477b-bc9c-1cc821b67545" alt="iProphIT Logo">
 </p>
 <p align="center">
   <strong>A deep learning approach that identifies the inducible activity of prophages from their DNA sequences.</strong>
