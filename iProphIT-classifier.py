@@ -359,7 +359,7 @@ class SiameseCNNTransformerModel(nn.Module):
         logits = self.classifier(transformer_out)
         return logits, attn_weights
 
-# 预测函数（输出 active/dormant）
+# 预测函数（输出 active/dormant + 置信度）
 def predict(model, dataloader, records, device, output_file):
     model.eval()
     predictions = []
@@ -368,7 +368,10 @@ def predict(model, dataloader, records, device, output_file):
         for i, (inputs, original_lengths) in enumerate(dataloader):
             inputs, original_lengths = inputs.to(device), original_lengths.to(device)
             outputs, _ = model(inputs, original_lengths, training=False)
-            _, predicted = torch.max(outputs, 1)
+            
+            # 计算 softmax 概率和置信度
+            probs = F.softmax(outputs, dim=1)
+            confidences, predicted = torch.max(probs, 1)
             
             start_idx = i * dataloader.batch_size
             end_idx = min(start_idx + dataloader.batch_size, len(records))
@@ -377,7 +380,8 @@ def predict(model, dataloader, records, device, output_file):
             for j in range(len(predicted)):
                 if j < len(batch_records):
                     label = "active" if predicted[j].item() == 1 else "dormant"
-                    predictions.append(f"{batch_records[j].id}\t{label}")
+                    confidence = confidences[j].item()
+                    predictions.append(f"{batch_records[j].id}\t{label}\t{confidence:.4f}")
                 else:
                     logger.warning(f"Index {start_idx + j} out of bounds for records")
             
@@ -385,7 +389,7 @@ def predict(model, dataloader, records, device, output_file):
 
     os.makedirs(os.path.dirname(output_file), exist_ok=True)
     with open(output_file, 'w') as f:
-        f.write("ID\tPredict\n")
+        f.write("ID\tPredict\tConfidence\n")
         f.write("\n".join(predictions))
     logger.info(f"Predictions saved to {output_file}")
 
@@ -439,6 +443,10 @@ if __name__ == "__main__":
     parser.add_argument('-m', '--model', default='./iProphIT_model-v1.pth', help='Path to the trained model file (default: ./iProphIT_model-v1.pth)')
     parser.add_argument('-o', '--output', default='./Result.tsv', help='Output TSV file path (default: ./Result.tsv)')
     parser.add_argument('-t', '--threads', type=int, default=4, help='Number of CPU threads for DataLoader (default: 4)')
+    parser.add_argument('-b', '--batch_size', type=int, default=4, 
+                    help=('Batch size for prediction (default: 4). Larger values accelerate inference.\n'
+                          'GPU: Increase for speedup until CUDA OOM, then reduce.\n'
+                          'CPU: Can use larger values due to more RAM.'))
 
     args = parser.parse_args()
 
@@ -462,7 +470,7 @@ if __name__ == "__main__":
         model_path=args.model,
         fasta_file=args.input,
         output_file=args.output,
-        batch_size=4,                 # 固定 batch_size 为 4
+        batch_size=args.batch_size,   # 使用命令行传入的 batch_size
         window_size=128,              # 固定 window_size 为 128
         overlap_percent=0.25,         # 固定 overlap_percent 为 0.25
         num_threads=args.threads
