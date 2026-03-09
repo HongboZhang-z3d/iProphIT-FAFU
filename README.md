@@ -53,15 +53,19 @@ options:
                         Output TSV file path (default: ./Result.tsv)
   -t THREADS, --threads THREADS
                         Number of CPU threads for DataLoader (default: 4)
+  -b BATCH_SIZE, --batch_size BATCH_SIZE
+                          Batch size for prediction (default: 4). Larger values accelerate inference.
+                          GPU: Increase for speedup until CUDA OOM, then reduce.
+                          CPU: Can use larger values due to more RAM.
 ```
 
 ## Typical output
 - Find result in Result.tsv  
 
-  | ID | Predict |
-  |----------|:--------:|
-  | prophage1     | active  |
-  | prophage2  | dormant   |
+  | ID | Predict | Confidence |
+  |----------|:--------:|:--------:|
+  | prophage1     | active  | 0.9981  |
+  | prophage2  | dormant   | 0.9221  |
 
 - Explanation  
 1.**`ID`** is the content of the description line in the genome file.  
@@ -79,9 +83,9 @@ python iProphIT-classifier.py -i test_iProphIT.fasta -m iProphIT_model-v1.pth -o
 
 - Output of the test
 ```bash
-ID	Predict
-OY731326.1	active
-OY731419.1	active
+ID	Predict	Confidence
+OY731326.1	active	0.9989
+OY731419.1	active	0.9927
 ```
 
 ## Notes
