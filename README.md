@@ -41,7 +41,7 @@ python iProphIT-classifier.py -i test_iProphIT.fasta -m iProphIT_model-v1.pth -o
 ## Usage
 
 ```bash
-usage: iProphIT-classifier.py [-h] -i INPUT [-m MODEL] [-o OUTPUT] [-t THREADS]
+usage: iProphIT-classifier.py [-h] -i INPUT [-m MODEL] [-o OUTPUT] [-t THREADS] [-b BATCH_SIZE]
 
 options:
   -h, --help            show this help message and exit
