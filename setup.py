@@ -4,9 +4,9 @@ from setuptools import setup, find_packages
 
 setup(
     name='iprophit',
-    version='1.0.0',
+    version='1.0.0', 
     packages=find_packages(),
-    python_requires='>=3.12,<3.13',
+    python_requires='>=3.12', 
     
     entry_points={
         'console_scripts': [
@@ -20,7 +20,7 @@ setup(
         'numpy>=2.0,<2.4',
         'pandas>=1.5.0',
         'tqdm>=4.60.0',
-        'requests',  # 用于下载权重
+        'requests',
     ],
     
     author='Hongbo Zhang',
