@@ -43,7 +43,7 @@ mamba install -c bioconda iprophit
 
 
 ## Run iProphIT
-### Method 1: Download from GitHub should be run iProphIT according to the following steps:
+### Method 1: To run iProphIT via GitHub download, follow these steps:
 **1.** Download **`iProphIT-classifier.py`**， **`iProphIT_model-v1.pth`** and put them in your working path.   
 
 **2.** Run **`iProphIT-classifier.py`**
@@ -53,7 +53,7 @@ python iProphIT-classifier.py -i test_iProphIT.fasta -m iProphIT_model-v1.pth -o
 ```
 
 
-### Method 2: Bioconda Installation can directly run the following command:
+### Method2: To install via Bioconda, run the following command directly:
 ```bash
 iprophit -i test_iProphIT.fasta -m iProphIT_model-v1.pth -o ./Result.tsv -t 16
 ```
