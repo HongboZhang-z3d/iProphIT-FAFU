@@ -17,11 +17,14 @@ System and software requirements:
 - **pytorch**    *(If you want to enable GPU acceleration, please install the appropriate GPU-enabled PyTorch version from the official PyTorch website.)*
 
 ## Installation
-**1.** You only need to download **`iProphIT-classifier.py`** and **`iProphIT_model-v1.pth`** into your working directory.  
+
+**1.** You need to download **`iProphIT-classifier.py`** and **`iProphIT_model-v1.pth`** into your working directory.  
 (iProphIT_model-v1.pth website: (https://doi.org/10.5281/zenodo.17605580)   
 
-**2.** Create a conda environment and install required packages:
+**2.** Download tool
 
+**Method 1: Manual Installation**  
+Create a conda environment and install required packages:
 ```bash
 conda create -n iprophit python=3.12
 conda activate iprophit
@@ -29,7 +32,18 @@ conda install -c conda-forge biopython numpy
 conda install pytorch
 ```
 
+**Method 2: Bioconda Installation**
+```bash
+conda install -c bioconda iprophit
+```
+```bash
+#or use mamba for faster installation:
+mamba install -c bioconda iprophit
+```
+
+
 ## Run iProphIT
+### Method 1: Download from GitHub
 **1.** Download **`iProphIT-classifier.py`**， **`iProphIT_model-v1.pth`** and put them in your working path.   
 
 **2.** Run **`iProphIT-classifier.py`**
@@ -37,6 +51,13 @@ conda install pytorch
 ```bash
 python iProphIT-classifier.py -i test_iProphIT.fasta -m iProphIT_model-v1.pth -o ./Result.tsv -t 16
 ```
+
+
+### Method 2: Bioconda Installation
+```bash
+iprophit -i test_iProphIT.fasta -m iProphIT_model-v1.pth -o ./Result.tsv -t 16
+```
+
 
 ## Usage
 
