@@ -858,9 +858,9 @@ def main(active_fasta, dormant_fasta,
     torch.cuda.empty_cache()
 
 if __name__ == "__main__":
-    active_fasta = '/ampha/tenant/fafu/private/user/zhb/file/prophage_seq_Transformer/model/test/CNN+TransformerV16+Siamese_Network_final/data/train_induce_prophage.fasta'
-    dormant_fasta = '/ampha/tenant/fafu/private/user/zhb/file/prophage_seq_Transformer/model/test/CNN+TransformerV16+Siamese_Network_final/data/train_uninduce_prophage.fasta'
-    output_dir = "/ampha/tenant/fafu/private/user/zhb/file/prophage_seq_Transformer/model/test/CNN+TransformerV16+Siamese_Network_final/TRAIN_ONLY"
+    active_fasta = '/ampha/tenant/fafu/private/user/zhb/file/iprophit/train_induce_prophage.fasta'
+    dormant_fasta = '/ampha/tenant/fafu/private/user/zhb/file/iprophit/data/train_uninduce_prophage.fasta'
+    output_dir = "/ampha/tenant/fafu/private/user/zhb/file/iprophit/TRAIN_MODEL"
 
     logger.info(f"PyTorch version: {torch.__version__}")
     logger.info(f"CUDA available: {torch.cuda.is_available()}")
