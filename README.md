@@ -19,7 +19,7 @@ System and software requirements:
 ## Installation
 
 **1.** You need to download **`iProphIT-classifier.py`** and **`iProphIT_model-v1.pth`** into your working directory.  
-(iProphIT_model-v1.pth website: (https://doi.org/10.5281/zenodo.17605580)   
+(iProphIT_model-v1.pth website: (https://doi.org/10.5281/zenodo.19450281)   
 
 **2.** Download tool
 
