@@ -17,11 +17,14 @@ System and software requirements:
 - **pytorch**    *(If you want to enable GPU acceleration, please install the appropriate GPU-enabled PyTorch version from the official PyTorch website.)*
 
 ## Installation
-**1.** You only need to download **`iProphIT-classifier.py`** and **`iProphIT_model-v1.pth`** into your working directory.  
-(iProphIT_model-v1.pth website: (https://doi.org/10.5281/zenodo.17605580)   
 
-**2.** Create a conda environment and install required packages:
+**1.** You need to download **`classifier.py`** and **`iProphIT_model-v1.pth`** into your working directory.  
+(download the model weight file **`iProphIT_model-v1.pth`** from Zenodo (https://doi.org/10.5281/zenodo.17605580), or use the command-line argument **`--download_model`** for automatic download.)   
 
+**2.** Download tool
+
+**Method 1: Manual Installation**  
+Create a conda environment and install required packages:
 ```bash
 conda create -n iprophit python=3.12
 conda activate iprophit
@@ -29,24 +32,43 @@ conda install -c conda-forge biopython numpy
 conda install pytorch
 ```
 
-## Run iProphIT
-**1.** Download **`iProphIT-classifier.py`**， **`iProphIT_model-v1.pth`** and put them in your working path.   
+**Method 2: Bioconda Installation**
+```bash
+conda install -c bioconda iprophit
+```
+```bash
+#or use mamba for faster installation:
+mamba install -c bioconda iprophit
+```
 
-**2.** Run **`iProphIT-classifier.py`**
+
+## Run iProphIT
+### Method 1: To run iProphIT via GitHub download, follow these steps:
+**1.** Download **`classifier.py`**， **`iProphIT_model-v1.pth`** and put them in your working path.   
+
+**2.** Run **`classifier.py`**
 
 ```bash
-python iProphIT-classifier.py -i test_iProphIT.fasta -m iProphIT_model-v1.pth -o ./Result.tsv -t 16
+python classifier.py -i test_iProphIT.fasta -m iProphIT_model-v1.pth -o ./Result.tsv -t 16
 ```
+
+
+### Method2: To install via Bioconda, run the following command directly:
+```bash
+iprophit -i test_iProphIT.fasta -m iProphIT_model-v1.pth -o ./Result.tsv -t 16
+```
+
 
 ## Usage
 
 ```bash
-usage: iProphIT-classifier.py [-h] -i INPUT [-m MODEL] [-o OUTPUT] [-t THREADS] [-b BATCH_SIZE]
+usage: classifier.py [-h] [-i INPUT] [-m MODEL] [-o OUTPUT] [-t THREADS]
+                     [-b BATCH_SIZE] [--download_model DIR]
 
-options:
+optional arguments:
   -h, --help            show this help message and exit
   -i INPUT, --input INPUT
-                        Path to the input FASTA file (required)
+                        Path to the input FASTA file (required for prediction)
   -m MODEL, --model MODEL
                         Path to the trained model file (default: ./iProphIT_model-v1.pth)
   -o OUTPUT, --output OUTPUT
@@ -54,9 +76,12 @@ options:
   -t THREADS, --threads THREADS
                         Number of CPU threads for DataLoader (default: 4)
   -b BATCH_SIZE, --batch_size BATCH_SIZE
-                          Batch size for prediction (default: 4). Larger values accelerate inference.
-                          GPU: Increase for speedup until CUDA OOM, then reduce.
-                          CPU: Can use larger values due to more RAM.
+                        Batch size for prediction (default: 4). Larger values accelerate inference.
+                        GPU: Increase for speedup until CUDA OOM, then reduce.
+                        CPU: Can use larger values due to more RAM.
+  --download_model DIR  Download the pre-trained iProphIT model from Zenodo to the specified directory.
+                        Directory will be created if it does not exist. After downloading, the script exits.
+
 ```
 
 ## Typical output
@@ -78,7 +103,7 @@ source: Dahlman S. et al., Nature (2025), https://doi.org/10.1038/s41586-025-096
 - Run **`iProphIT-classifier.py`**
 
 ```bash
-python iProphIT-classifier.py -i test_iProphIT.fasta -m iProphIT_model-v1.pth -o ./Result.tsv -t 16
+iprophit -i test_iProphIT.fasta -m iProphIT_model-v1.pth -o ./Result.tsv -t 16
 ```
 
 - Output of the test
