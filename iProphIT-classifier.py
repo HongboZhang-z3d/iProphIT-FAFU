@@ -3,6 +3,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 import logging
 import os
+import urllib.request
+import urllib.error
 from Bio import SeqIO
 from torch.utils.data import DataLoader, Dataset
 from torch.nn.utils.rnn import pad_sequence
@@ -28,9 +30,9 @@ def set_seed(seed):
 set_seed(47003)
 
 # 词汇表（独热编码）
-vocab = {'A': [1, 0, 0, 0], 'G': [0, 1, 0, 0], 'C': [0, 0, 1, 0], 'T': [0, 0, 0, 1], '[PAD]': [0, 0, 0, 0]}
+vocab = {'A': [1, 0, 0, 0], 'G': [0, 1, 0, 0], 'C': [0, 0, 1, 0], 'T': [0, 0, 0, 1], '': [0, 0, 0, 0]}
 input_dim = 4
-vocab_map = {'A': 0, 'G': 1, 'C': 2, 'T': 3, '[PAD]': 4}
+vocab_map = {'A': 0, 'G': 1, 'C': 2, 'T': 3, '': 4}
 vocab_array = np.array(list(vocab.values()), dtype=np.float32)
 
 # 批量将字符串序列转换为张量表示（向量化）
@@ -76,7 +78,7 @@ def batch_str_to_tensor(seq_strs, vocab_map, vocab_array, n_threshold=0.025):
         np.random.seed(None)
         seq_str = ''.join(seq_list)
         
-        seq_array = np.array([vocab_map.get(base, vocab_map['[PAD]']) for base in seq_str], dtype=np.int32)
+        seq_array = np.array([vocab_map.get(base, vocab_map['']) for base in seq_str], dtype=np.int32)
         one_hot = vocab_array[seq_array]
         results.append(torch.tensor(one_hot, dtype=torch.float))
 
@@ -419,6 +421,60 @@ def run_prediction(model_path, fasta_file, output_file, batch_size=4, window_siz
     predict(model, dataloader, records, device, output_file)
     logger.info("Prediction completed")
 
+# ==================== 新增：模型下载功能 ====================
+
+MODEL_URL = "https://zenodo.org/records/19450281/files/iProphIT_model-v1.pth?download=1"
+MODEL_FILENAME = "iProphIT_model-v1.pth"
+
+class DownloadProgress:
+    def __init__(self):
+        self.downloaded = 0
+        self.total = 0
+
+    def __call__(self, block_num, block_size, total_size):
+        self.downloaded += block_size
+        self.total = total_size
+        if total_size > 0:
+            percent = min(self.downloaded / total_size * 100, 100)
+            if block_num % 20 == 0 or percent >= 100:
+                mb = self.downloaded / (1024 * 1024)
+                total_mb = total_size / (1024 * 1024)
+                print(f"\rDownloading... {percent:.1f}% ({mb:.1f}/{total_mb:.1f} MB)", end="", flush=True)
+        else:
+            print(f"\rDownloading... {self.downloaded} bytes", end="", flush=True)
+
+def download_model(target_dir):
+    """
+    从 Zenodo 自动下载 iProphIT 预训练模型到指定目录。
+    目录不存在则自动创建。
+    """
+    if not os.path.isdir(target_dir):
+        logger.info(f"Directory '{target_dir}' does not exist, creating it.")
+        os.makedirs(target_dir, exist_ok=True)
+
+    output_path = os.path.join(target_dir, MODEL_FILENAME)
+
+    if os.path.isfile(output_path):
+        logger.info(f"Model file already exists at '{output_path}', skipping download.")
+        return output_path
+
+    logger.info(f"Starting download from Zenodo to '{output_path}' ...")
+    try:
+        progress = DownloadProgress()
+        urllib.request.urlretrieve(MODEL_URL, output_path, reporthook=progress)
+        print()
+        logger.info(f"Model successfully downloaded to '{output_path}'")
+    except urllib.error.URLError as e:
+        print(f"\nError: Failed to download model. {e.reason}", file=sys.stderr)
+        sys.exit(1)
+    except Exception as e:
+        print(f"\nError: Unexpected error during download: {e}", file=sys.stderr)
+        sys.exit(1)
+
+    return output_path
+
+# ==================== 主函数与参数解析 ====================
+
 def main():
     logo = r"""
           _ ____                  _     ___ _____ 
@@ -435,7 +491,7 @@ def main():
          formatter_class=argparse.RawTextHelpFormatter
     )
 
-    parser.add_argument('-i', '--input', required=True, help='Path to the input FASTA file (required)')
+    parser.add_argument('-i', '--input', help='Path to the input FASTA file (required for prediction)')
     parser.add_argument('-m', '--model', default='./iProphIT_model-v1.pth', help='Path to the trained model file (default: ./iProphIT_model-v1.pth)')
     parser.add_argument('-o', '--output', default='./Result.tsv', help='Output TSV file path (default: ./Result.tsv)')
     parser.add_argument('-t', '--threads', type=int, default=4, help='Number of CPU threads for DataLoader (default: 4)')
@@ -443,8 +499,21 @@ def main():
                     help=('Batch size for prediction (default: 4). Larger values accelerate inference.\n'
                           'GPU: Increase for speedup until CUDA OOM, then reduce.\n'
                           'CPU: Can use larger values due to more RAM.'))
+    parser.add_argument('--download_model', metavar='DIR', default=None,
+                    help=('Download the pre-trained iProphIT model from Zenodo to the specified directory.\n'
+                          'Directory will be created if it does not exist. After downloading, the script exits.'))
 
     args = parser.parse_args()
+
+    # 如果指定了 --download_model，执行下载后退出
+    if args.download_model is not None:
+        download_model(args.download_model)
+        sys.exit(0)
+
+    # 预测模式下 -i 是必需的
+    if not args.input:
+        print("Error: Input file '-i/--input' is required for prediction.", file=sys.stderr)
+        sys.exit(1)
 
     # 检查输出扩展名
     if not args.output.lower().endswith('.tsv'):
