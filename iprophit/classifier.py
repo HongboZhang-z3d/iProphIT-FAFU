@@ -123,7 +123,7 @@ def prediction_collate_fn(batch):
     original_lengths = torch.tensor([len(seq) for seq in sequences])
     return padded_sequences, original_lengths
 
-# 加载模型（只包含必要的模型类）
+# 加载模型
 class RotaryPositionalEncoding(nn.Module):
     def __init__(self, d_k, max_seq_len=7000):
         super().__init__()
@@ -421,8 +421,6 @@ def run_prediction(model_path, fasta_file, output_file, batch_size=4, window_siz
     predict(model, dataloader, records, device, output_file)
     logger.info("Prediction completed")
 
-# ==================== 新增：模型下载功能 ====================
-
 MODEL_URL = "https://zenodo.org/records/19450281/files/iProphIT_model-v1.pth?download=1"
 MODEL_FILENAME = "iProphIT_model-v1.pth"
 
@@ -505,12 +503,12 @@ def main():
 
     args = parser.parse_args()
 
-    # 如果指定了 --download_model，执行下载后退出
+    # 指定了 --download_model，执行下载后退出
     if args.download_model is not None:
         download_model(args.download_model)
         sys.exit(0)
 
-    # 预测模式下 -i 是必需的
+    # 预测模式下 -i 必需
     if not args.input:
         print("Error: Input file '-i/--input' is required for prediction.", file=sys.stderr)
         sys.exit(1)
