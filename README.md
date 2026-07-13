@@ -14,6 +14,9 @@ System and software requirements:
 - **Python 3.x**    *(Any Python version compatible with PyTorch，Tested with Python 3.12.)*
 - **biopython**
 - **numpy**
+- **pandas**
+- **tqdm**
+- **urllib3**
 - **pytorch**    *(If you want to enable GPU acceleration, please install the appropriate GPU-enabled PyTorch version from the official PyTorch website.)*
 
 ## Installation
@@ -23,13 +26,18 @@ System and software requirements:
 
 **2.** Download tool
 
-**Method 1: Manual Installation**  
+**Prerequisites: Create Conda Environment**  
 Create a conda environment and install required packages:
 ```bash
 conda create -n iprophit python=3.12
 conda activate iprophit
-conda install -c conda-forge biopython numpy
+conda install -c conda-forge biopython numpy tqdm pandas urllib3
 conda install pytorch
+```
+
+**Method 1: Manual Installation**  
+```bash
+git clone https://github.com/HongboZhang-z3d/iProphIT-FAFU.git
 ```
 
 **Method 2: Bioconda Installation**
@@ -62,10 +70,9 @@ iprophit -i test_iProphIT.fasta -m iProphIT_model-v1.pth -o ./Result.tsv -t 16
 ## Usage
 
 ```bash
-usage: classifier.py [-h] [-i INPUT] [-m MODEL] [-o OUTPUT] [-t THREADS]
-                     [-b BATCH_SIZE] [--download_model DIR]
+usage: iprophit [-h] [-i INPUT] [-m MODEL] [-o OUTPUT] [-t THREADS] [-b BATCH_SIZE] [--download_model DIR]
 
-optional arguments:
+options:
   -h, --help            show this help message and exit
   -i INPUT, --input INPUT
                         Path to the input FASTA file (required for prediction)
