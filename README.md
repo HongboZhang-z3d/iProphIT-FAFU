@@ -22,7 +22,7 @@ System and software requirements:
 ## Installation
 
 **1.** You need to download **`classifier.py`** and **`iProphIT_model-v1.pth`** into your working directory.  
-(download the model weight file **`iProphIT_model-v1.pth`** from Zenodo (https://doi.org/10.5281/zenodo.19450281), or use the command-line argument **`--download_model`** for automatic download.)   
+(download the model weight file **`iProphIT_model-v1.pth`** from Zenodo (https://doi.org/10.5281/zenodo.21453066), or use the command-line argument **`--download_model`** for automatic download.)   
 
 **2.** Download tool
 
